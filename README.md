@@ -24,9 +24,6 @@ The Jetson Nano serves as a companion computer, facilitating data exchange with 
 
 The [Dronekit Python API](https://dronekit-python.readthedocs.io/en/latest/about/index.html) simplifies the parsing and construction of MAVLink data, allowing higher-level data manipulation and command transmission to Ardupilot.
 
-Refer to the system diagram below for a visual overview of the setup.
-
-![System Diagram](images/system_diagram.jpg)
 
 ### Momo
 
