@@ -1,54 +1,57 @@
-# Ardupilot drone control by WebRTC and ROS
+# Ardupilot Drone Control via WebRTC and ROS
 
-The purpose of this project is to create a simple ground control system (GCS) for non-engineer user whose can easily operate the drone by pressing flight mode button and selecting the pre-defined mission from drone engineer. It is just "Proof-of-Concept" or POC project, not for commercial.
+This project demonstrates a straightforward ground control system (GCS) designed for non-technical users, allowing them to operate a drone by simply pressing flight mode buttons and selecting predefined missions. It's a Proof-of-Concept (POC) project intended for demonstration purposes, not commercial use.
 
-This project is consisted of two repositories,
+This project is divided into two main repositories:
 
-1. Back-end (this repo) which takes care of the communication in low-level with Cubepilot by MAVLink, and also in high-level to parse data from user GCS or to send telemetry data back to user GCS.
+1. **Back-end (this repository):** Handles low-level communication with the Cubepilot via MAVLink and manages the data exchange between the user’s GCS and the drone, including telemetry feedback.
 
-2. Front-end from [Cielo Jordan's repo](https://github.com/cielojordan) which takes care of communication from signaling server, displaying the parse data to user GCS, and pack the user's command to send back to robot. And also a design of user interface.
+2. **Front-end:** Managed by [Cielo Jordan](https://github.com/cielojordan), this repository facilitates communication with the signaling server, displays parsed data on the GCS, and packages user commands for transmission back to the drone. It also includes the user interface design.
 
-## Hardware
+## Hardware Requirements
 
-- A completed setup of drone with basic peripheral, pleas check on Ardupilot documentation [here](https://ardupilot.org/copter/docs/initial-setup.html).
+- A fully assembled drone with standard peripherals. Refer to the Ardupilot documentation for setup details [here](https://ardupilot.org/copter/docs/initial-setup.html).
+- A companion computer (e.g., Jetson Nano 2GB).
+- USB-UART converter (such as [this one](https://digilent.com/reference/pmod/pmodusbuart/start)).
+- 4G LTE router (with SIM card) to provide internet access for the Jetson Nano.
+- USB webcam.
 
-- A companion computer, in this case I am using Jetson Nano 2GB
+![Hardware Setup](images/hardware.jpg)
 
-- USB-UART converter, I am using [this](https://digilent.com/reference/pmod/pmodusbuart/start).
+## Overview
 
-- 4G LTE router (with sim card) to allow Jetson nano to have internet access.
+The Jetson Nano serves as a companion computer, facilitating data exchange with the Cubepilot onboard the drone. Communication between these two systems uses MAVLink over the TELEM2 port.
 
-- USB webcam
+The [Dronekit Python API](https://dronekit-python.readthedocs.io/en/latest/about/index.html) simplifies the parsing and construction of MAVLink data, allowing higher-level data manipulation and command transmission to Ardupilot.
 
-![](images/hardware.jpg)
+Refer to the system diagram below for a visual overview of the setup.
 
-## Concept
+![System Diagram](images/system_diagram.jpg)
 
-We are using Jetson nano as a companion computer to send/receive data to Cubepilot on the drone, the communication between these two computers is MAVLink on TELEM2 port. 
+### Momo
 
-The [Dronekit python API](https://dronekit-python.readthedocs.io/en/latest/about/index.html) can help parsing/constructig MAVLink data which we can easily grab and use it on higher level, and also send command back to Ardupilot.
+Momo is an open-source WebRTC project that enables video streaming from the drone's camera to any web application, along with message passing for user interaction with the drone's companion computer.
 
-Please look at the diagram below, and follow along with the explanation.
+For more details on Momo, visit:
 
-![](images/system_diagram.jpg)
+- [Momo Official Site](https://momo.shiguredo.jp/)
+- [Momo GitHub Repository](https://github.com/shiguredo/momo)
 
-### momo
+To transmit data and video over the internet, Ayame is used as a signaling server. Ayame’s developers provide a free server for this purpose. Further information is available at:
 
-Momo is the WebRTC opensource project which can stream video camera to any web application, and along side with message that allow user to interact with robot's computer.
+- [Ayame Official Site](https://ayame-labo.shiguredo.jp/)
+- [Ayame GitHub Repository](https://github.com/OpenAyame/ayame)
 
-Please check more detail of this project on following links
+You can download the Momo binary from their [release page](https://github.com/shiguredo/momo/releases).
 
-https://momo.shiguredo.jp/
+Afterward, create pseudo-serial ports and run Momo with the following command:
 
-https://github.com/shiguredo/momo
+```sh
+# Create /dev/pts/* port pairs
+socat -t 0 -d -d pty,raw,echo=0 pty,raw,echo=0 
 
-And in order to send data/video over the internet, you will need to setup Ayame as a signaling server, the original developer of momo provides this server to use for free, please check on the link below,
-
-https://ayame-labo.shiguredo.jp/
-
-https://github.com/OpenAyame/ayame
-
-You can download the binary from their [release page](https://github.com/shiguredo/momo/releases). 
+# On Jetson Nano
+./momo --hw-mjpeg-decoder 0 --no-audio-device --video-device /dev/video0 --resolution 1920x1080 --serial {1st_port},9600 ayame --signaling-url wss://ayame-labo.shiguredo.jp/signaling --channel-id {your_channel_id} --signaling-key {your_signaling_key}
 
 Next step is to create the pseudo serial ports, and run momo with the command below,
 
@@ -210,7 +213,3 @@ python apm_data_publisher.py --console_port {2nd_port} --serial /dev/ttyUSB0:921
 The web console application is showing a basic telemetry data such as latitude/longitude/altitude, attitude, voltage/current, and ETA in auto mode. There are just flight mode buttons and mission selector drop down. So this simplified GCS is suite for non-experience user of drone or Ardupilot stuff, so he/she wouldn't be overwhelming of a lot of buttons, graph, and so on. So a design is as simple as possible.
 
 ![](images/console_structure.jpg)
-
-## Demo video
-
-https://youtu.be/yCfv2GKhkXs
