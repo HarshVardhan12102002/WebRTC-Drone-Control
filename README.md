@@ -6,7 +6,7 @@ This project is divided into two main repositories:
 
 1. **Back-end (this repository):** Handles low-level communication with the Cubepilot via MAVLink and manages the data exchange between the user’s GCS and the drone, including telemetry feedback.
 
-2. **Front-end:** Managed by [Cielo Jordan](https://github.com/cielojordan), this repository facilitates communication with the signaling server, displays parsed data on the GCS, and packages user commands for transmission back to the drone. It also includes the user interface design.
+2. **Front-end:**This repository facilitates communication with the signaling server, displays parsed data on the GCS, and packages user commands for transmission back to the drone. It also includes the user interface design.
 
 ## Hardware Requirements
 
