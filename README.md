@@ -79,7 +79,7 @@ so you will need to change
 
 - `--signaling-key {your_signaling_key}` to the key of your signaling server configuration.
 
-If there is no error, and signaling server is running, you can check on the url that hosting your web application. Please check more detail of this on [Cielo Jordan's repo](https://github.com/cielojordan).
+If there is no error, and signaling server is running, you can check on the url that hosting your web application.
 
 The data from buttons, or any user input from the web console will arrive at the Jetson nano on `/dev/pts/1` port, to simply check we can run `cat /dev/pts/1` to see data from user. At the same time, we would like to push some data to the web console, we need to echo the data to this `/dev/pts/1` port, for example `echo hello > /dev/pts/1`. This will be sending a string text as "hello" to web console.
 
